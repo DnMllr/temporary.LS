@@ -6,11 +6,12 @@
     route('index', function(){}, 'consolelog', function(it){
       return console.log("logged " + it);
     }, 'render', function(param){
-      templates.name.variable = function(){
+      templates.name1.variable = function(){
         return param;
       };
-      return templates.name.render(document.getElementById('target'));
+      return templates.name1.render(document.getElementById('target'));
     }, 'session', function(){
+      debugger;
       templates.name2.variable = function(){
         return session.get('hello');
       };

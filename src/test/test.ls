@@ -6,8 +6,8 @@ route \index ->
 , \consolelog ->
   console.log "logged #{it}"
 , \render (param) ->
-  templates.name.variable = -> param
-  templates.name.render document.getElementById \target
+  templates.name1.variable = -> param
+  templates.name1.render document.getElementById \target
 , \session ->
   templates.name2.variable = -> session.get \hello
   templates.name2.render document.getElementById \target

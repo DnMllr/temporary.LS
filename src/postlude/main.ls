@@ -7,6 +7,7 @@
   previous-route-array = location.pathname / '/'
   route-changes = []
   templates = {
+    # TODO do this more intelligently
     render-all: ->
       for key, value of @
         value._rerender! unless key is \renderAll
@@ -69,7 +70,7 @@
     find-links-to-routes target
 
   rerender-func = ->
-    @render @pastTarget if @pastTarget?
+    @render @_pastTarget if @_pastTarget?
 
   find-links-to-routes!
   find-templates!

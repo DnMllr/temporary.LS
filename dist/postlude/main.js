@@ -120,8 +120,8 @@ if (key[0] !== '_' && key !== 'render') {
       }
     };
     rerenderFunc = function(){
-      if (this.pastTarget != null) {
-        return this.render(this.pastTarget);
+      if (this._pastTarget != null) {
+        return this.render(this._pastTarget);
       }
     };
     findLinksToRoutes();
