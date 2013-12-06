@@ -1,10 +1,8 @@
+{each} = require \prelude-ls
+
 module.exports = (grunt) ->
-  
-  grunt.load-npm-tasks \grunt-livescript
-  grunt.load-npm-tasks \grunt-contrib-clean
-  grunt.load-npm-tasks \grunt-contrib-watch
-  grunt.load-npm-tasks \grunt-contrib-copy
-  grunt.load-npm-tasks \grunt-concurrent
+
+  each (-> grunt.load-npm-tasks it), <[ grunt-livescript grunt-contrib-clean grunt-contrib-watch grunt-contrib-copy grunt-concurrent grunt-shell ]>
 
   grunt.init-config do
 
@@ -30,13 +28,18 @@ module.exports = (grunt) ->
       target:
         expand: true
         cwd: \src/
-        src: <[ ** !**/*.ls ]>
+        src: <[ ** !**/*.ls !**/*.jade ]>
         dest: \dist/
         filter: \isFile
+
+    shell:
+      jade:
+        options: {}
+        command: [ 'mkdir dist/templates' 'clientjade ./src/templates/ > ./dist/templates/template.js' ] * '&&'
 
     watch:
 
       files: <[ src/**/* gruntfile.ls ]>
       tasks: <[ default ]>
 
-  grunt.register-task \default, <[ clean copy livescript watch ]>
+  grunt.register-task \default, <[ clean copy livescript shell watch ]>

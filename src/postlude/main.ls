@@ -6,8 +6,22 @@
   present-route-array = location.pathname / '/'
   previous-route-array = location.pathname / '/'
   route-changes = []
-  session = {}
-  templates = {}
+  templates = {
+    render-all: ->
+      for key, value of @
+        value.rerender! unless key is \renderAll
+  }
+
+  class Session
+    (@name) ->
+    properties: {}
+    get: (property) ->
+      @properties[property]
+    set: (property, value) ->
+      @properties[property] = value
+      templates.render-all!
+      value
+
 
   register-route = (name, action) ->
     routes[name] := action
@@ -59,32 +73,47 @@
 
   # TODO use handlebars.js, don't try and roll your own
   find-templates = ->
-    all-templates = document.getElementsByTagName \template
-    templates := {[(template.getAttribute \name ), {temp: template.innerHTML, render: renderFunc}] for template in all-templates}
-    for name, template of templates
-      for character, index in template.temp
-        if character is '{' and template.temp[index+1] is '{'
-          remainder = template.temp.slice index + 2
-          closer = remainder.indexOf '}'
-          if remainder[closer+1] is '}'
-            key = remainder.slice 0 closer
-            template[key] = ''
-            template.rendered = (template.temp.slice 0 index) + remainder.slice closer + 2
+    all-templates = [key for key of jade.templates]
+    console.log all-templates
+    templates <<< {[name, {_identity: name, render: render-func, _past-target: null, _rerender: rerender-func}] for name in all-templates}
+
+
+
+    # all-templates = document.getElementsByTagName \template
+    # templates <<< {[(template.getAttribute \name ), {temp: template.innerHTML, render: render-func, pastTarget: null, rerender: rerender-func}] for template in all-templates}
+    # for name, template of templates
+    #   continue if name is \renderAll
+    #   for character, index in template.temp
+    #     if character is '{' and template.temp[index+1] is '{'
+    #       remainder = template.temp.slice index + 2
+    #       closer = remainder.indexOf '}'
+    #       if remainder[closer+1] is '}'
+    #         key = remainder.slice 0 closer
+    #         template[key] = -> ''
+    #         template.rendered = (template.temp.slice 0 index) + remainder.slice closer + 2
 
   
-  renderFunc = (target, destructive = true) ->
-    for character, index in @temp
-      if character is '{' and @temp[index+1] is '{'
-        remainder = @temp.slice index + 2
-        closer = remainder.indexOf '}'
-        if remainder[closer+1] is '}'
-          key = remainder.slice 0 closer
-          # TODO this is going to cause a problem with more than one handlebars
-          @rendered = (@temp.slice 0 index) + @[key] + remainder.slice closer + 2
-    if destructive
-      target.innerHTML = @rendered
-    else
-      target.innerHTML += @rendered
+  render-func = (target) ->
+    @_past-target = target
+    jade.render target, @_identity, {[key, value!] for key, value of @ when key[0] isnt \_ and key isnt \render}
+
+    # for character, index in @temp
+    #   if character is '{' and @temp[index+1] is '{'
+    #     remainder = @temp.slice index + 2
+    #     closer = remainder.indexOf '}'
+    #     if remainder[closer+1] is '}'
+    #       key = remainder.slice 0 closer
+    #       # TODO this is going to cause a problem with more than one handlebars
+    #       console.log typeof @[key]
+    #       console.log @
+    #       @rendered = (@temp.slice 0 index) + @[key]! + remainder.slice closer + 2
+    # if destructive
+    #   target.innerHTML = @rendered
+    # else
+    #   target.innerHTML += @rendered
+
+  rerender-func = ->
+    @render @pastTarget if @pastTarget?
 
   find-links-to-routes!
   find-templates!
@@ -103,7 +132,7 @@
 
   ######### RUN INPUTTED CODE ########
 
-  code session, templates, route, initialize
+  code (new Session \primary ), templates, route, initialize
 
   ######### DEVELOPEMENT ONLY ######### TODO remove this code
 

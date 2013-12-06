@@ -2,6 +2,7 @@
 <head>
 <title> test </title>
 <script type="text/javascript" src='lib/prelude.js'></script>
+<script type="text/javascript" src='templates/template.js'></script>
 </head>
 <body>
   <nav>
@@ -10,12 +11,16 @@
     <a href="/render/1"> render template with 1 </a></br>
     <a href="/render/2"> render template with 2 </a></br>
     <a href="/render/1/consolelog/2"> render template with 1, console.log 2 </a></br>
+    <a href="/session"> Session </a></br>
   </nav>
   <div id='target'>
     
   </div>
-  <template name='somelink1'>
+  <template name='name'>
     does this render? {{variable}}
+  </template>
+  <template name='name2'>
+    SessionStore {{variable}}
   </template>
   <script type='text/javascript' src='postlude/main.js'></script>
   <script type='text/javascript' src='test/test.js'></script>

@@ -5,6 +5,13 @@ initialize ->
 route \index ->
 , \consolelog ->
   console.log "logged #{it}"
-, \render ->
-  templates.somelink1.variable = it
-  templates.somelink1.render document.getElementById \target
+, \render (param) ->
+  templates.name.variable = -> param
+  templates.name.render document.getElementById \target
+, \session ->
+  templates.name2.variable = -> session.get \hello
+  templates.name2.render document.getElementById \target
+  session.set \hello \hello
+  session.set \hello \goodbye
+
+@session = session

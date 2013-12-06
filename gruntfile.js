@@ -1,10 +1,10 @@
 (function(){
+  var each;
+  each = require('prelude-ls').each;
   module.exports = function(grunt){
-    grunt.loadNpmTasks('grunt-livescript');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-concurrent');
+    each(function(it){
+      return grunt.loadNpmTasks(it);
+    }, ['grunt-livescript', 'grunt-contrib-clean', 'grunt-contrib-watch', 'grunt-contrib-copy', 'grunt-concurrent', 'grunt-shell']);
     grunt.initConfig({
       clean: ['./dist/**'],
       livescript: {
@@ -26,9 +26,15 @@
         target: {
           expand: true,
           cwd: 'src/',
-          src: ['**', '!**/*.ls'],
+          src: ['**', '!**/*.ls', '!**/*.jade'],
           dest: 'dist/',
           filter: 'isFile'
+        }
+      },
+      shell: {
+        jade: {
+          options: {},
+          command: ['mkdir dist/templates', 'clientjade ./src/templates/ > ./dist/templates/template.js'].join('&&')
         }
       },
       watch: {
@@ -36,6 +42,6 @@
         tasks: ['default']
       }
     });
-    return grunt.registerTask('default', ['clean', 'copy', 'livescript', 'watch']);
+    return grunt.registerTask('default', ['clean', 'copy', 'livescript', 'shell', 'watch']);
   };
 }).call(this);

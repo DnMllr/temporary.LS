@@ -3,11 +3,21 @@
     initialize(function(){
       return console.log('welcome to postlude.ls!');
     });
-    return route('index', function(){}, 'consolelog', function(it){
+    route('index', function(){}, 'consolelog', function(it){
       return console.log("logged " + it);
-    }, 'render', function(it){
-      templates.somelink1.variable = it;
-      return templates.somelink1.render(document.getElementById('target'));
+    }, 'render', function(param){
+      templates.name.variable = function(){
+        return param;
+      };
+      return templates.name.render(document.getElementById('target'));
+    }, 'session', function(){
+      templates.name2.variable = function(){
+        return session.get('hello');
+      };
+      templates.name2.render(document.getElementById('target'));
+      session.set('hello', 'hello');
+      return session.set('hello', 'goodbye');
     });
+    return this.session = session;
   });
 }).call(this);

@@ -2,13 +2,40 @@
   var ref$, zip, compact, difference, map, last, this$ = this, split$ = ''.split;
   ref$ = require('prelude-ls'), zip = ref$.zip, compact = ref$.compact, difference = ref$.difference, map = ref$.map, last = ref$.last;
   this.postlude = function(code){
-    var routes, presentRouteArray, previousRouteArray, routeChanges, session, templates, registerRoute, findLinksToRoutes, findTemplates, renderFunc, route, initialize;
+    var routes, presentRouteArray, previousRouteArray, routeChanges, templates, Session, registerRoute, findLinksToRoutes, findTemplates, renderFunc, rerenderFunc, route, initialize;
     routes = {};
     presentRouteArray = split$.call(location.pathname, '/');
     previousRouteArray = split$.call(location.pathname, '/');
     routeChanges = [];
-    session = {};
-    templates = {};
+    templates = {
+      renderAll: function(){
+        var key, value, results$ = [];
+        for (key in this) {
+          value = this[key];
+          if (key !== 'renderAll') {
+            results$.push(value.rerender());
+          }
+        }
+        return results$;
+      }
+    };
+    Session = (function(){
+      Session.displayName = 'Session';
+      var prototype = Session.prototype, constructor = Session;
+      function Session(name){
+        this.name = name;
+      }
+      prototype.properties = {};
+      prototype.get = function(property){
+        return this.properties[property];
+      };
+      prototype.set = function(property, value){
+        this.properties[property] = value;
+        templates.renderAll();
+        return value;
+      };
+      return Session;
+    }());
     registerRoute = function(name, action){
       return routes[name] = action;
     };
@@ -44,56 +71,44 @@
       }
     };
     findTemplates = function(){
-      var allTemplates, res$, i$, len$, template, name, lresult$, ref$, index, character, remainder, closer, key, results$ = [];
-      allTemplates = document.getElementsByTagName('template');
-      res$ = {};
-      for (i$ = 0, len$ = allTemplates.length; i$ < len$; ++i$) {
-        template = allTemplates[i$];
-        res$[template.getAttribute('name')] = {
-          temp: template.innerHTML,
-          render: renderFunc
-        };
+      var allTemplates, res$, key, name;
+      res$ = [];
+      for (key in jade.templates) {
+        res$.push(key);
       }
-      templates = res$;
-      for (name in templates) {
-        template = templates[name];
-        lresult$ = [];
-        for (i$ = 0, len$ = (ref$ = template.temp).length; i$ < len$; ++i$) {
-          index = i$;
-          character = ref$[i$];
-          if (character === '{' && template.temp[index + 1] === '{') {
-            remainder = template.temp.slice(index + 2);
-            closer = remainder.indexOf('}');
-            if (remainder[closer + 1] === '}') {
-              key = remainder.slice(0, closer);
-              template[key] = '';
-              lresult$.push(template.rendered = template.temp.slice(0, index) + remainder.slice(closer + 2));
-            }
-          }
+      allTemplates = res$;
+      console.log(allTemplates);
+      return import$(templates, (function(){
+        var i$, ref$, len$, results$ = {};
+        for (i$ = 0, len$ = (ref$ = allTemplates).length; i$ < len$; ++i$) {
+          name = ref$[i$];
+          results$[name] = {
+            _identity: name,
+            render: renderFunc,
+            _pastTarget: null,
+            _rerender: rerenderFunc
+          };
         }
-        results$.push(lresult$);
-      }
-      return results$;
+        return results$;
+      }()));
     };
-    renderFunc = function(target, destructive){
-      var i$, ref$, len$, index, character, remainder, closer, key;
-      destructive == null && (destructive = true);
-      for (i$ = 0, len$ = (ref$ = this.temp).length; i$ < len$; ++i$) {
-        index = i$;
-        character = ref$[i$];
-        if (character === '{' && this.temp[index + 1] === '{') {
-          remainder = this.temp.slice(index + 2);
-          closer = remainder.indexOf('}');
-          if (remainder[closer + 1] === '}') {
-            key = remainder.slice(0, closer);
-            this.rendered = this.temp.slice(0, index) + this[key] + remainder.slice(closer + 2);
+    renderFunc = function(target){
+      var key, value;
+      this._pastTarget = target;
+      return jade.render(target, this._identity, (function(){
+        var results$ = {};
+        for (key in this) {
+          value = this[key];
+if (key[0] !== '_' && key !== 'render') {
+            results$[key] = value();
           }
         }
-      }
-      if (destructive) {
-        return target.innerHTML = this.rendered;
-      } else {
-        return target.innerHTML += this.rendered;
+        return results$;
+      }.call(this)));
+    };
+    rerenderFunc = function(){
+      if (this.pastTarget != null) {
+        return this.render(this.pastTarget);
       }
     };
     findLinksToRoutes();
@@ -110,8 +125,13 @@
     initialize = function(it){
       return it();
     };
-    code(session, templates, route, initialize);
+    code(new Session('primary'), templates, route, initialize);
     this$.routes = routes;
     return this$.templates = templates;
   };
+  function import$(obj, src){
+    var own = {}.hasOwnProperty;
+    for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+    return obj;
+  }
 }).call(this);
