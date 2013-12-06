@@ -13,7 +13,7 @@
         for (key in this) {
           value = this[key];
           if (key !== 'renderAll') {
-            results$.push(value.rerender());
+            results$.push(value._rerender());
           }
         }
         return results$;
@@ -39,9 +39,10 @@
     registerRoute = function(name, action){
       return routes[name] = action;
     };
-    findLinksToRoutes = function(){
+    findLinksToRoutes = function(target){
       var allLinks, i$, len$, link, results$ = [];
-      allLinks = document.getElementsByTagName('a');
+      target == null && (target = document);
+      allLinks = target.getElementsByTagName('a');
       for (i$ = 0, len$ = allLinks.length; i$ < len$; ++i$) {
         link = allLinks[i$];
         results$.push(link.addEventListener('click', fn$, true));
@@ -93,18 +94,32 @@
       }()));
     };
     renderFunc = function(target){
-      var key, value;
+      var flag, obj, res$, key, value, e, missingObj;
       this._pastTarget = target;
-      return jade.render(target, this._identity, (function(){
-        var results$ = {};
+      flag = true;
+      while (flag) {
+        res$ = {};
         for (key in this) {
           value = this[key];
 if (key[0] !== '_' && key !== 'render') {
-            results$[key] = value();
+            res$[key] = value();
           }
         }
-        return results$;
-      }.call(this)));
+        obj = res$;
+        try {
+          jade.render(target, this._identity, obj);
+          flag = false;
+        } catch (e$) {
+          e = e$;
+          missingObj = e.message.slice(0, e.message.indexOf(' is not defined'));
+          this[missingObj] = fn$;
+          console.log(this);
+        }
+      }
+      return findLinksToRoutes(target);
+      function fn$(){
+        return '';
+      }
     };
     rerenderFunc = function(){
       if (this.pastTarget != null) {

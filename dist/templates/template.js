@@ -184,12 +184,21 @@ jade.render = function(node, template, data) {
   node.innerHTML = tmp;
 };
 
+jade.templates["app"] = function(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<!DOCTYPE html><html lang="en"><head><title>test</title><script type="text/javascript" src="lib/prelude.js"></script><script type="text/javascript" src="templates/template.js"></script></head><body><div id="viewport"></div><script type="text/javascript" src="postlude/main.js"></script><script type="text/javascript" src="test/test.js"></script></body></html>');
+}
+return buf.join("");
+}
 jade.templates["index"] = function(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<!DOCTYPE html><html lang="en"><head><title>test</title><script type="text/javascript" src="lib/prelude.js"></script></head><body><nav><a href="/consolelog/1">console.log 1</a><br><a href="/consolelog/2">console.log 2</a><br><a href="/render/1">render template with 1</a><br><a href="/render/2">render template with 2</a><br><a href="/render/hello/consolelog/goodbye">render template with hello, console.log goodbye</a><br><a href="/session">change the session variable</a></nav><div id="target"></div><script type="text/javascript" src="postlude/main.js"></script><script type="text/javascript" src="test/test.js"></script></body></html>');
+buf.push('<nav><a href="/consolelog/1">console.log 1</a><br/><a href="/consolelog/2">console.log 2</a><br/><a href="/render/1">render template with 1</a><br/><a href="/render/2">render template with 2</a><br/><a href="/render/hello/consolelog/goodbye">render template with hello, console.log goodbye</a><br/><a href="/session">change the session variable</a></nav>');
 }
 return buf.join("");
 }

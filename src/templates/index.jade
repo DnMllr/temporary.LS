@@ -1,21 +1,12 @@
-doctype 5
-html(lang='en')
-  head
-    title test
-    script(type='text/javascript', src='lib/prelude.js')
-  body
-    nav
-      a(href='/consolelog/1') console.log 1
-      br
-      a(href='/consolelog/2') console.log 2
-      br
-      a(href='/render/1') render template with 1
-      br
-      a(href='/render/2') render template with 2
-      br
-      a(href='/render/hello/consolelog/goodbye') render template with hello, console.log goodbye
-      br
-      a(href='/session') change the session variable
-    #target
-    script(type='text/javascript', src='postlude/main.js')
-    script(type='text/javascript', src='test/test.js')
+nav
+  a(href='/consolelog/1') console.log 1
+  br
+  a(href='/consolelog/2') console.log 2
+  br
+  a(href='/render/1') render template with 1
+  br
+  a(href='/render/2') render template with 2
+  br
+  a(href='/render/hello/consolelog/goodbye') render template with hello, console.log goodbye
+  br
+  a(href='/session') change the session variable

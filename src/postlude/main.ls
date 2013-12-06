@@ -9,7 +9,7 @@
   templates = {
     render-all: ->
       for key, value of @
-        value.rerender! unless key is \renderAll
+        value._rerender! unless key is \renderAll
   }
 
   class Session
@@ -30,9 +30,9 @@
 
   # We are assuming that the url commands have already been registered at this step.
   # The event listener should only figure out in what way the url has changed and so what commands need to be run/rerun
-  find-links-to-routes = ->
+  find-links-to-routes = (target = document)->
     # find all of the links
-    all-links = document.getElementsByTagName \a
+    all-links = target.getElementsByTagName \a
     # iterate over them
     for link in all-links
       # add an event listener to each link
@@ -77,40 +77,20 @@
     console.log all-templates
     templates <<< {[name, {_identity: name, render: render-func, _past-target: null, _rerender: rerender-func}] for name in all-templates}
 
-
-
-    # all-templates = document.getElementsByTagName \template
-    # templates <<< {[(template.getAttribute \name ), {temp: template.innerHTML, render: render-func, pastTarget: null, rerender: rerender-func}] for template in all-templates}
-    # for name, template of templates
-    #   continue if name is \renderAll
-    #   for character, index in template.temp
-    #     if character is '{' and template.temp[index+1] is '{'
-    #       remainder = template.temp.slice index + 2
-    #       closer = remainder.indexOf '}'
-    #       if remainder[closer+1] is '}'
-    #         key = remainder.slice 0 closer
-    #         template[key] = -> ''
-    #         template.rendered = (template.temp.slice 0 index) + remainder.slice closer + 2
-
   
   render-func = (target) ->
     @_past-target = target
-    jade.render target, @_identity, {[key, value!] for key, value of @ when key[0] isnt \_ and key isnt \render}
-
-    # for character, index in @temp
-    #   if character is '{' and @temp[index+1] is '{'
-    #     remainder = @temp.slice index + 2
-    #     closer = remainder.indexOf '}'
-    #     if remainder[closer+1] is '}'
-    #       key = remainder.slice 0 closer
-    #       # TODO this is going to cause a problem with more than one handlebars
-    #       console.log typeof @[key]
-    #       console.log @
-    #       @rendered = (@temp.slice 0 index) + @[key]! + remainder.slice closer + 2
-    # if destructive
-    #   target.innerHTML = @rendered
-    # else
-    #   target.innerHTML += @rendered
+    flag = true
+    while flag
+      obj = {[key, value!] for key, value of @ when key[0] isnt \_ and key isnt \render}
+      try
+        jade.render target, @_identity, obj
+        flag = false
+      catch e
+        missing-obj = e.message.slice 0, e.message.indexOf ' is not defined'
+        @[missing-obj] = -> ''
+        console.log @
+    find-links-to-routes target
 
   rerender-func = ->
     @render @pastTarget if @pastTarget?
