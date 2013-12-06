@@ -25,56 +25,33 @@
 
   register-route = (name, action) ->
     routes[name] := action
-    # action.callback.apply @, action.params if name in present-route-array
 
-
-  # We are assuming that the url commands have already been registered at this step.
-  # The event listener should only figure out in what way the url has changed and so what commands need to be run/rerun
   find-links-to-routes = (target = document)->
-    # find all of the links
     all-links = target.getElementsByTagName \a
-    # iterate over them
     for link in all-links
-      # add an event listener to each link
       link.addEventListener \click ->
         it.preventDefault!
-        # redefine the present-route-array
         present-route-array := compact it.target.href / '/'
-        # create a hotseat to call
         hotseat = \index
-        # and parameters to call it with
         params = []
         # TODO make it call only the changes in the url (iterate backwards!!!)
-        # iterate over the route array
         for route, index in present-route-array
-          # if the present route has an associated function
           if routes[route]?
-            # call the hotseat
             routes[hotseat].apply @, params
-            # clear parameters
             params = []
-            # put the new route in the hotseat
             hotseat = route
-          # otherwise assume it's a parameter
           else
-            # push it into the parameters
             params.push route
-        # apply the final hotseat
         routes[hotseat].apply @, params
-        # set the previous route to the present route
         previous-route-array := present-route-array
-        # push history state
         history.pushState {}, it.target.textContent, it.target.href
-        # return false
         false
       , true
 
 
 
-  # TODO use handlebars.js, don't try and roll your own
   find-templates = ->
     all-templates = [key for key of jade.templates]
-    console.log all-templates
     templates <<< {[name, {_identity: name, render: render-func, _past-target: null, _rerender: rerender-func}] for name in all-templates}
 
   
@@ -89,7 +66,6 @@
       catch e
         missing-obj = e.message.slice 0, e.message.indexOf ' is not defined'
         @[missing-obj] = -> ''
-        console.log @
     find-links-to-routes target
 
   rerender-func = ->

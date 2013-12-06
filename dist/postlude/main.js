@@ -78,7 +78,6 @@
         res$.push(key);
       }
       allTemplates = res$;
-      console.log(allTemplates);
       return import$(templates, (function(){
         var i$, ref$, len$, results$ = {};
         for (i$ = 0, len$ = (ref$ = allTemplates).length; i$ < len$; ++i$) {
@@ -113,7 +112,6 @@ if (key[0] !== '_' && key !== 'render') {
           e = e$;
           missingObj = e.message.slice(0, e.message.indexOf(' is not defined'));
           this[missingObj] = fn$;
-          console.log(this);
         }
       }
       return findLinksToRoutes(target);
