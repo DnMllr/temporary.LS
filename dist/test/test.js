@@ -11,7 +11,6 @@
       };
       return templates.name1.render(document.getElementById('target'));
     }, 'session', function(){
-      debugger;
       templates.name2.variable = function(){
         return session.get('hello');
       };

@@ -2,7 +2,7 @@
   var ref$, zip, compact, difference, map, last, this$ = this, split$ = ''.split;
   ref$ = require('prelude-ls'), zip = ref$.zip, compact = ref$.compact, difference = ref$.difference, map = ref$.map, last = ref$.last;
   this.postlude = function(code){
-    var routes, presentRouteArray, previousRouteArray, routeChanges, templates, Session, registerRoute, findLinksToRoutes, findTemplates, renderFunc, rerenderFunc, route, initialize;
+    var routes, presentRouteArray, previousRouteArray, routeChanges, templates, Session, registerRoute, navingateTo, findLinksToRoutes, findTemplates, renderFunc, rerenderFunc, route, initialize;
     routes = {};
     presentRouteArray = split$.call(location.pathname, '/');
     previousRouteArray = split$.call(location.pathname, '/');
@@ -39,6 +39,26 @@
     registerRoute = function(name, action){
       return routes[name] = action;
     };
+    navingateTo = function(url){
+      var hotseat, params, i$, len$, index, route;
+      presentRouteArray = split$.call(url, '/');
+      hotseat = 'index';
+      params = [];
+      for (i$ = 0, len$ = presentRouteArray.length; i$ < len$; ++i$) {
+        index = i$;
+        route = presentRouteArray[i$];
+        if (routes[route] != null) {
+          routes[hotseat].apply(this, params);
+          params = [];
+          hotseat = route;
+        } else {
+          params.push(route);
+        }
+      }
+      routes[hotseat].apply(this, params);
+      previousRouteArray = presentRouteArray;
+      return history.pushState({}, 'nothing', url);
+    };
     findLinksToRoutes = function(target){
       var allLinks, i$, len$, link, results$ = [];
       target == null && (target = document);
@@ -49,25 +69,8 @@
       }
       return results$;
       function fn$(it){
-        var hotseat, params, i$, len$, index, route;
         it.preventDefault();
-        presentRouteArray = compact(split$.call(it.target.href, '/'));
-        hotseat = 'index';
-        params = [];
-        for (i$ = 0, len$ = presentRouteArray.length; i$ < len$; ++i$) {
-          index = i$;
-          route = presentRouteArray[i$];
-          if (routes[route] != null) {
-            routes[hotseat].apply(this, params);
-            params = [];
-            hotseat = route;
-          } else {
-            params.push(route);
-          }
-        }
-        routes[hotseat].apply(this, params);
-        previousRouteArray = presentRouteArray;
-        history.pushState({}, it.target.textContent, it.target.href);
+        navingateTo(it.target.href);
         return false;
       }
     };

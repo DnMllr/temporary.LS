@@ -23,38 +23,37 @@
       templates.render-all!
       value
 
-
   register-route = (name, action) ->
     routes[name] := action
+
+  navingate-to = (url) ->
+    present-route-array := url / '/'
+    hotseat = \index
+    params = []
+    # TODO make it call only the changes in the url (iterate backwards!!!)
+    for route, index in present-route-array
+      if routes[route]?
+        routes[hotseat]apply @, params
+        params = []
+        hotseat = route
+      else
+        params.push route
+    routes[hotseat]apply @, params
+    previous-route-array := present-route-array
+    history.pushState {}, \nothing, url
 
   find-links-to-routes = (target = document)->
     all-links = target.getElementsByTagName \a
     for link in all-links
       link.addEventListener \click ->
         it.preventDefault!
-        present-route-array := compact it.target.href / '/'
-        hotseat = \index
-        params = []
-        # TODO make it call only the changes in the url (iterate backwards!!!)
-        for route, index in present-route-array
-          if routes[route]?
-            routes[hotseat].apply @, params
-            params = []
-            hotseat = route
-          else
-            params.push route
-        routes[hotseat].apply @, params
-        previous-route-array := present-route-array
-        history.pushState {}, it.target.textContent, it.target.href
+        navingate-to it.target.href
         false
       , true
-
-
 
   find-templates = ->
     all-templates = [key for key of jade.templates]
     templates <<< {[name, {_identity: name, render: render-func, _past-target: null, _rerender: rerender-func}] for name in all-templates}
-
   
   render-func = (target) ->
     @_past-target = target
@@ -74,7 +73,6 @@
 
   find-links-to-routes!
   find-templates!
-
 
   ######### ROUTE FUNCTION #########
 
