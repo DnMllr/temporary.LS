@@ -1,4 +1,7 @@
 {zip, compact, difference, map, last} = require \prelude-ls
+socket = io.connect \http://localhost
+
+socket.on 'navigate to' -> console.log it
 
 @postlude = (code) ~>
 
@@ -56,17 +59,18 @@
     templates <<< {[name, {_identity: name, render: render-func, _past-target: null, _rerender: rerender-func}] for name in all-templates}
   
   render-func = (target) ->
+    el = document.querySelector target
     @_past-target = target
     flag = true
     while flag
       obj = {[key, value!] for key, value of @ when key[0] isnt \_ and key isnt \render}
       try
-        jade.render target, @_identity, obj
+        jade.render el, @_identity, obj
         flag = false
       catch e
         missing-obj = e.message.slice 0, e.message.indexOf ' is not defined'
         @[missing-obj] = -> ''
-    find-links-to-routes target
+    find-links-to-routes el
 
   rerender-func = ->
     @render @_pastTarget if @_pastTarget?

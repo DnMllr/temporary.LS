@@ -1,6 +1,10 @@
 (function(){
-  var ref$, zip, compact, difference, map, last, this$ = this, split$ = ''.split;
+  var ref$, zip, compact, difference, map, last, socket, this$ = this, split$ = ''.split;
   ref$ = require('prelude-ls'), zip = ref$.zip, compact = ref$.compact, difference = ref$.difference, map = ref$.map, last = ref$.last;
+  socket = io.connect('http://localhost');
+  socket.on('navigate to', function(it){
+    return console.log(it);
+  });
   this.postlude = function(code){
     var routes, presentRouteArray, previousRouteArray, routeChanges, templates, Session, registerRoute, navingateTo, findLinksToRoutes, findTemplates, renderFunc, rerenderFunc, route, initialize;
     routes = {};
@@ -96,7 +100,8 @@
       }()));
     };
     renderFunc = function(target){
-      var flag, obj, res$, key, value, e, missingObj;
+      var el, flag, obj, res$, key, value, e, missingObj;
+      el = document.querySelector(target);
       this._pastTarget = target;
       flag = true;
       while (flag) {
@@ -109,7 +114,7 @@ if (key[0] !== '_' && key !== 'render') {
         }
         obj = res$;
         try {
-          jade.render(target, this._identity, obj);
+          jade.render(el, this._identity, obj);
           flag = false;
         } catch (e$) {
           e = e$;
@@ -117,7 +122,7 @@ if (key[0] !== '_' && key !== 'render') {
           this[missingObj] = fn$;
         }
       }
-      return findLinksToRoutes(target);
+      return findLinksToRoutes(el);
       function fn$(){
         return '';
       }

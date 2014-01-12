@@ -1,0 +1,8 @@
+#todoHolder
+  #target
+  form
+    {submit}
+      emit('submitted', find('#newTodo'));
+      find('#newTodo').value = '';
+      return false;
+    input(type='text', id='newTodo')

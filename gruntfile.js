@@ -4,7 +4,7 @@
   module.exports = function(grunt){
     each(function(it){
       return grunt.loadNpmTasks(it);
-    }, ['grunt-livescript', 'grunt-contrib-clean', 'grunt-contrib-watch', 'grunt-contrib-copy', 'grunt-concurrent', 'grunt-shell']);
+    }, ['grunt-livescript', 'grunt-contrib-clean', 'grunt-client-blade', 'grunt-contrib-watch', 'grunt-contrib-copy', 'grunt-concurrent', 'grunt-contrib-jade', 'grunt-shell', 'grunt-contrib-stylus']);
     grunt.initConfig({
       clean: ['./dist/**'],
       livescript: {
@@ -26,15 +26,15 @@
         target: {
           expand: true,
           cwd: 'src/',
-          src: ['**', '!**/*.ls', '!**/*.jade'],
+          src: ['**', '!**/*.ls', '!**/*.jade', '!**/*.styl'],
           dest: 'dist/',
           filter: 'isFile'
         }
       },
-      shell: {
-        jade: {
-          options: {},
-          command: ['mkdir dist/templates', 'clientjade ./src/templates/ > ./dist/templates/template.js'].join('&&')
+      clientBlade: {
+        target: {
+          src: ['src/**/*.blade'],
+          dest: 'dist/lib/templates.js'
         }
       },
       watch: {
@@ -42,6 +42,6 @@
         tasks: ['default']
       }
     });
-    return grunt.registerTask('default', ['clean', 'copy', 'livescript', 'shell', 'watch']);
+    return grunt.registerTask('default', ['clean', 'copy', 'livescript', 'clientBlade', 'watch']);
   };
 }).call(this);

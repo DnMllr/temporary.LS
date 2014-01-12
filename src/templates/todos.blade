@@ -1,0 +1,24 @@
+-var i = 0;
+foreach todos as todo
+  - if(todo.done)
+    .todo.done
+      = i
+      input.todoBox(type='checkbox' checked disabled)
+      = todo.name
+      input.remove(type='button')
+        {click}
+          todo.remove = true;
+          emit('remove')
+  - else
+    .todo
+      = i
+      input.todoBox(type='checkbox')
+        {click}
+          todo.done = true
+          render('#target')
+      = todo.name
+  - i++
+|
+  number of todos is #{count}
+  number of todos completed is #{left}
+- console.log(left);

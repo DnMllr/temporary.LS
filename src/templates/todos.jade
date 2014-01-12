@@ -1,0 +1,8 @@
+each todo, index in todos
+  .todo
+    if todo.done
+      input.todoBox(type='checkbox', checked)
+    else
+      input.todoBox(type='checkbox')
+    .key= todo.name
+| #{count}

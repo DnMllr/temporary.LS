@@ -9,12 +9,12 @@
       templates.name1.variable = function(){
         return param;
       };
-      return templates.name1.render(document.getElementById('target'));
+      return templates.name1.render('#target');
     }, 'session', function(){
       templates.name2.variable = function(){
         return session.get('hello');
       };
-      templates.name2.render(document.getElementById('target'));
+      templates.name2.render('#target');
       session.set('hello', 'hello');
       return session.set('hello', 'goodbye');
     });
